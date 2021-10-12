@@ -20,7 +20,7 @@ public class PharmacyController {
     public ResponseEntity<List<Pharmacy>> getAll() {
         return ResponseEntity.ok(pharmacyRepository.findAll());
     }
-    
+
     public ResponseEntity<Pharmacy> getById(long id){
         return ResponseEntity.ok(pharmacyRepository.getById(id));
     }
