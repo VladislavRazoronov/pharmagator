@@ -20,4 +20,27 @@ public class PharmacyController {
     public ResponseEntity<List<Pharmacy>> getAll() {
         return ResponseEntity.ok(pharmacyRepository.findAll());
     }
+    
+    public ResponseEntity<Pharmacy> getById(long id){
+        return ResponseEntity.ok(pharmacyRepository.getById(id));
+    }
+
+    public void create(String name, String medicine_link_template){
+        Pharmacy new_instance = new Pharmacy();
+        new_instance.setName(name);
+        new_instance.setMedicineLinkTemplate(medicine_link_template);
+        pharmacyRepository.save(new_instance);
+    }
+
+    public void update(long id, String new_name, String new_link){
+        Pharmacy temp = pharmacyRepository.getById(id);
+        temp.setName(new_name);
+        temp.setMedicineLinkTemplate(new_link);
+        pharmacyRepository.deleteById(id);
+        pharmacyRepository.save(temp);
+    }
+
+    public void deleteById(long id){
+        pharmacyRepository.deleteById(id);
+    }
 }
