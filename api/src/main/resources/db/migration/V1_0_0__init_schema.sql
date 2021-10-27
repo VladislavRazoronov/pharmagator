@@ -16,4 +16,5 @@ CREATE TABLE prices (
     external_id varchar(100) not null,
     updated_at timestamp not null default now(),
     PRIMARY KEY (pharmacy_id, medicine_id)
-);
+); 
+

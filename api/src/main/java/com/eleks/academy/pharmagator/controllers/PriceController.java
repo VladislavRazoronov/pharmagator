@@ -1,52 +1,94 @@
 package com.eleks.academy.pharmagator.controllers;
 
+
+import com.eleks.academy.pharmagator.controllers.dto.PriceDto;
 import com.eleks.academy.pharmagator.entities.Price;
+import com.eleks.academy.pharmagator.entities.PriceId;
+import com.eleks.academy.pharmagator.repositories.MedicineRepository;
+import com.eleks.academy.pharmagator.repositories.PharmacyRepository;
 import com.eleks.academy.pharmagator.repositories.PriceRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
-@Controller
-@RequiredArgsConstructor
+@RestController
 @RequestMapping("/prices")
+@RequiredArgsConstructor
 public class PriceController {
+
     private final PriceRepository priceRepository;
 
+    private final MedicineRepository medicineRepository;
+
+    private final PharmacyRepository pharmacyRepository;
+
+    private final ModelMapper modelMapper;
+
     @GetMapping
-    public ResponseEntity<List<Price>> getAll() {
-        return ResponseEntity.ok(priceRepository.findAll());
+    public List<Price> getAll() {
+        return priceRepository.findAll();
     }
 
-    public ResponseEntity<Price> getById(long id){
-        return ResponseEntity.ok(priceRepository.getById(id));
+    @GetMapping("/{pharmacyId}/{medicineId}")
+    public ResponseEntity<Price> getById(
+            @PathVariable("pharmacyId") Long pharmacyId,
+            @PathVariable("medicineId") Long medicineId) {
+
+        PriceId priceId = new PriceId(pharmacyId, medicineId);
+
+        return this.priceRepository.findById(priceId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public void create(int pharm_id,int med_id,BigDecimal price, String external_id){
-        Price new_instance = new Price();
-        new_instance.setPharmacyId(pharm_id);
-        new_instance.setMedicineId(med_id);
-        new_instance.setPrice(price);
-        new_instance.setExternalId(external_id);
-        new_instance.setUpdatedAt(Instant.now());
-        priceRepository.save(new_instance);
+    @PostMapping("/{pharmacyId}/{medicineId}")
+    public ResponseEntity<Price> update(
+            @Valid @RequestBody PriceDto priceDto,
+            @PathVariable("pharmacyId") Long pharmacyId,
+            @PathVariable("medicineId") Long medicineId) {
+        PriceId priceId = new PriceId(pharmacyId, medicineId);
+        
+        Function<PriceId, Optional<Price>> create = id ->
+                this.pharmacyRepository.findById(id.getPharmacyId())
+                        .map(pharmacy -> Price.builder()
+                                .pharmacyId(pharmacy.getId())
+                        )
+                        .flatMap(builder ->
+                                this.medicineRepository.findById(id.getMedicineId())
+                                        .map(medicine -> builder
+                                                .medicineId(medicine.getId())
+                                        )
+                        )
+                        .map(builder -> builder
+                                .price(priceDto.getPrice())
+                                .externalId(priceDto.getExternalId()))
+                        .map(Price.PriceBuilder::build);
+
+        return this.priceRepository.findById(priceId)
+                .map(source -> {
+                    source.setPrice(priceDto.getPrice());
+                    source.setExternalId(priceDto.getExternalId());
+                    return source;
+                }).or(() -> create.apply(priceId))
+                .map(this.priceRepository::save)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
-    public void update(long id, BigDecimal new_price, String new_external_id){
-        Price temp = priceRepository.getById(id);
-        temp.setPrice(new_price);
-        temp.setExternalId(new_external_id);
-        temp.setUpdatedAt(Instant.now());
-        priceRepository.deleteById(id);
-        priceRepository.save(temp);
-    }
-
-    public void deleteById(long id){
-        priceRepository.deleteById(id);
+    @DeleteMapping("/{pharmacyId}/{medicineId}")
+    public ResponseEntity<?> delete(
+            @PathVariable("pharmacyId") Long pharmacyId,
+            @PathVariable("medicineId") Long medicineId) {
+        PriceId priceId = new PriceId(pharmacyId, medicineId);
+        priceRepository.deleteById(priceId);
+        return ResponseEntity.noContent().build();
     }
 }

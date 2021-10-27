@@ -1,1 +1,1 @@
-# pharmagator project
+# pharmagator
