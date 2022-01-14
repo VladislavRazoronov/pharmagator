@@ -1,8 +1,60 @@
+server:
+  port : 8080
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/pharmagator
-    username: root
-    password: 123
+    url: jdbc:postgresql:pharmagator
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        hbm2dll:
+          extra_physical_table_types: MATERIALIZED VIEW
+  thymeleaf:
+    cache: false
+
+pharmagator:
+  ui:
+    items-per-page: 10
+  data-providers:
+    pharmacy-slavutych:
+      pharmacy-name: pharmacy-slavutych
+      api-calls-limit: 3
+      base-url: https://aptslav.com.ua:3000/api/v1
+      categories-url: /categories
+      medicines-uri: /categories/87/products
+      medicineLinkTemplate: https://aptslav.com.ua:3000/api/v1/products/%d
+      page-size: 100
+    pharmacy-ds:
+      url: https://api-int.apteka-ds.com.ua/api/v1
+      category-fetch-url: /category-menu
+      category-path: /cat-prods-by-page
+      pharmacy-name: pharmacy-ds
+      page-limit: 1
+      products-per-page-limit: 10
+    pharmacy-anc:
+      url: https://anc.ua/productbrowser/v2/ua
+      category-fetch-url: /categories
+      page-size: 10
+      pharmacy-name: pharmacy-anc
+    pharmacy-liki24:
+      url: https://liki24.com/vnext/api/catalogue/8000002/products
+      initial-page-index: 1
+      pharmacy-name: pharmacy-liki24
+      page-limit: 5
+    pharmacy-rozetka:
+      url: https://xl-catalog-api.rozetka.com.ua/v4
+      product-ids-fetch-url: /goods/get
+      products-fetch-url: /goods/getDetails
+      sell-status: available
+      category-id: !!str 4628621
+      medicament-category-id: !!str 4628712
+      pharmacy-name: pharmacy-rozetka
+      page-limit: 5
+    apteka-socialna:
+      url: https://1sa.com.ua/medikamenty
+      pharmacy-name: apteka-911-socialna
+      page-limit: 5

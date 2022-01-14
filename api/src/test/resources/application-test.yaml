@@ -1,6 +1,12 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:test
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pharmagator
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: validate
+pharmagator:
+  ui:
+    items-per-page: 1

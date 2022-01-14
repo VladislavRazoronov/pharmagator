@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" class="h-100">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Pharmagator</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column h-100">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main role="main" class="flex-shrink-0">
+  <div class="container mt-5">
+    <div class="jumbotron">
+      <h1 class="display-4">Price</h1>
+    </div>
+
+    <form th:action="@{/scheduler}" method="get">
+      <button id="refresh" class="btn btn-primary" onclick="disableBtn(id)">Refresh Data</button>
+    </form>
+
+    <div th:switch="${pricesMap}">
+      <h2 th:case="null">No medicines yet!</h2>
+      <div th:case="*">
+        <div th:replace="~{fragments/medicinesPricesTable :: medicinesPricesTable}"> </div>
+      </div>
+    </div>
+
+    <div class="col-sm-10">
+      <!-- Pagination Bar -->
+      <div th:fragment='paginationbar'>
+        <div class="text-center">
+          <ul class='pagination'>
+            <li th:class="${currentPage == 1}?'disabled':''">
+              <span class="page-link" th:if='${currentPage == 1 }'>← First</span>
+              <a class="page-link" th:if='${currentPage != 1}' th:href='@{${url}(page=1,sortDirection=${sortDirection})}'>←
+                First</a>
+            </li>
+            <li th:class="${currentPage > 1}? '' : 'disabled'">
+              <span class="page-link" th:if='${currentPage == 1}'>«</span>
+              <a class="page-link" th:if='${currentPage != 1}'
+                 th:href='@{${url}(page=${currentPage - 1},sortDirection=${sortDirection})}'
+                 title='Go to previous page'>«</a>
+            </li>
+            <li th:each='item : ${pageItems}' th:class="${item.current}? 'page-item active' : 'page-item'">
+              <span class="page-link" th:if='${item.current}' th:text='${item.number}'>1</span>
+              <a class="page-link" th:if='${not item.current}'
+                 th:href='@{${url}(page=${item.number},sortDirection=${sortDirection})}'><span
+                      th:text='${item.number}'>1</span></a>
+            </li>
+            <li th:class="${currentPage < totalPages - 1}? '' : 'disabled'">
+              <span class="page-link" th:if='${currentPage == totalPages}'>»</span>
+              <a class="page-link" th:if='${currentPage < totalPages}'
+                 th:href='@{${url}(page=${currentPage + 1},sortDirection=${sortDirection})}'
+                 title='Go to next page'>»</a>
+            </li>
+            <li th:class="${currentPage == totalPages}? 'disabled' : ''">
+              <span class="page-link" th:if='${currentPage == totalPages}'>Last →</span>
+              <a class="page-link" th:if='${currentPage < totalPages}'
+                 th:href='@{${url}(page=${totalPages},sortDirection=${sortDirection})}'>Last →</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"> </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+<script>
+  function disableBtn(id){
+    setTimeout(function (){document.getElementById("refresh").disabled = true;
+      setTimeout(function(){document.getElementById("refresh").disabled = false;},30000);},1);
+  }
+  function mySubmitFunction()
+  {
+    return false;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Register form submit event handler for every form in your page
+    const forms = document.querySelectorAll('form');
+    if (forms) {
+      forms.forEach(f => {
+        let action = f.action;
+        f.addEventListener('submit', (event) => {
+          // prevent default behavior, i.e., form submission
+          event.preventDefault();
+          // perform server side request. you can use several options
+          // see https://developers.google.com/web/updates/2015/03/introduction-to-fetch, for instance
+          // For example, let's use fetch (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+          fetch(action)
+                  .then((response) => {
+                    if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                    }
+                    console.log('Request successfully completed');
+                  })
+                  .catch((error) => {
+                    console.error('There has been a problem while contacting server:',      error);
+                  });
+        });
+      });
+    }
+  });
+
+</script>
+</body>
+</html>

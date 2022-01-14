@@ -5,9 +5,9 @@ import lombok.*;
 import java.io.Serializable;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class PriceId implements Serializable {
-    private long pharmacyId;
-    private long medicineId;
+    private Long pharmacyId;
+    private Long medicineId;
 }

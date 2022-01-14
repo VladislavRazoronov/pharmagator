@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pharmagator</title>
+</head>
+<body>
+<table class="table table-bordered table-hover mt-3" th:fragment="medicinesPricesTable">
+    <thead>
+    <th class="background">
+        <div><span class="bottom">Medicine⬎</span>
+            <span class="top">Pharmacy&#11106;</span>
+            <div class="line"></div>
+        </div>
+    </th>
+    <th th:each="pharmacy : ${pharmacies}" th:text="${pharmacy.name}"></th>
+    </thead>
+    <tbody>
+    <tr th:each="entry1, stats1 : ${pricesMap}" th:with="prices=${entry1.value}">
+        <td th:text="${entry1.key}"></td>
+        <td th:each="pharmacy : ${pharmacies}" th:text="${prices.get(pharmacy.id)}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

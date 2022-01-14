@@ -1,35 +1,39 @@
 package com.eleks.academy.pharmagator.scheduler;
 
 import com.eleks.academy.pharmagator.dataproviders.DataProvider;
-import com.eleks.academy.pharmagator.dataproviders.dto.MedicineDto;
-import com.eleks.academy.pharmagator.entities.Medicine;
-import com.eleks.academy.pharmagator.entities.Price;
+import com.eleks.academy.pharmagator.services.AdvancedSearchService;
+import com.eleks.academy.pharmagator.services.ImportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@Profile("!test")
+@RequiredArgsConstructor
 public class Scheduler {
-    private final DataProvider dataProvider;
 
-    private final ModelMapper modelMapper;
+    private final List<DataProvider> dataProviderList;
 
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
+    private final ImportService importService;
+
+    private final AdvancedSearchService advancedSearchService;
+
+    @Scheduled(fixedDelay = 14, timeUnit = TimeUnit.HOURS)
     public void schedule() {
         log.info("Scheduler started at {}", Instant.now());
-        dataProvider.loadData().forEach(this::storeToDatabase);
+        dataProviderList.parallelStream()
+                .flatMap(DataProvider::loadData)
+                .forEach(importService::storeToDatabase);
+        log.info("Scheduler finished at {}", Instant.now());
+
+        advancedSearchService.refreshView();
     }
 
-    private void storeToDatabase(MedicineDto dto) {
-        Medicine medicine = modelMapper.map(dto, Medicine.class);
-        Price price = modelMapper.map(dto, Price.class);
-
-    }
 }
