@@ -1,44 +1,57 @@
 package com.eleks.academy.pharmagator.controllers;
 
-import com.eleks.academy.pharmagator.entities.Medicine;
-import com.eleks.academy.pharmagator.repositories.MedicineRepository;
+import com.eleks.academy.pharmagator.dataproviders.dto.input.MedicineDto;
+import com.eleks.academy.pharmagator.exceptions.InvalidIdentifierException;
+import com.eleks.academy.pharmagator.services.MedicineService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
-@Controller
-@RequiredArgsConstructor
+@RestController
 @RequestMapping("/medicines")
+@RequiredArgsConstructor
 public class MedicineController {
-    private final MedicineRepository medicineRepository;
+
+    private final MedicineService medicineService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<Medicine>> getAll() {
-        return ResponseEntity.ok(medicineRepository.findAll());
-    }
-    
-    public ResponseEntity<Medicine> getById(long id){
-        return ResponseEntity.ok(medicineRepository.getById(id));
+    public List<MedicineDto> getAll() {
+        return medicineService.findAll().stream()
+                .map(medicine -> modelMapper.map(medicine, MedicineDto.class))
+                .toList();
     }
 
-    public void create(String title){
-        Medicine new_instance = new Medicine();
-        new_instance.setTitle(title);
-        medicineRepository.save(new_instance);
+    @GetMapping("/{id:[\\d]+}")
+    public ResponseEntity<MedicineDto> getById(@PathVariable Long id) {
+        return medicineService.findById(id)
+                .map(medicine -> ResponseEntity.ok(modelMapper.map(medicine, MedicineDto.class)))
+                .orElseThrow(() -> new InvalidIdentifierException(id));
     }
 
-    public void update(long id, String new_title){
-        Medicine temp = medicineRepository.getById(id);
-        temp.setTitle(new_title);
-        medicineRepository.deleteById(id);
-        medicineRepository.save(temp);
+    @PostMapping
+    public MedicineDto create(@Valid @RequestBody MedicineDto medicineDto) {
+        return modelMapper.map(medicineService.save(medicineDto), MedicineDto.class);
     }
 
-    public void deleteById(long id){
-        medicineRepository.deleteById(id);
+    @PutMapping("/{id:[\\d]+}")
+    public ResponseEntity<MedicineDto> update(
+            @PathVariable Long id,
+            @Valid @RequestBody MedicineDto medicineDto) {
+
+        return medicineService.update(id, medicineDto)
+                .map(medicine -> ResponseEntity.ok(modelMapper.map(medicine, MedicineDto.class)))
+                .orElseThrow(() -> new InvalidIdentifierException(id));
     }
+
+    @DeleteMapping("/{id:[\\d]+}")
+    public ResponseEntity<MedicineDto> delete(@PathVariable Long id) {
+        medicineService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

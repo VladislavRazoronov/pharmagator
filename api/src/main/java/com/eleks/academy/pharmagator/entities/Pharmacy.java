@@ -1,19 +1,25 @@
 package com.eleks.academy.pharmagator.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+@Data
 @Entity
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "pharmacies")
 public class Pharmacy {
+
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String name;
+
     private String medicineLinkTemplate;
+
 }

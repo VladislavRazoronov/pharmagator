@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" class="h-100">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Pharmagator</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body class="d-flex flex-column h-100">
+
+<div th:replace="~{fragments/header :: header}"> </div>
+
+<main role="main" class="flex-shrink-0">
+    <div class="container mt-5">
+        <div class="jumbotron">
+            <h1 class="display-7">Here you could look through all medicines</h1>
+        </div>
+
+        <div th:switch="${meds}">
+            <h2 th:case="null">No medicines yet!</h2>
+            <div th:case="*">
+                <h2>Medicines</h2>
+                <table class="table table-bordered table-hover mt-3">
+                    <thead>
+                    <tr>
+                        <th>Title</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="med : ${meds}">
+                        <td th:text="${med.title}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-sm-10">
+            <!-- Pagination Bar -->
+            <div th:fragment='paginationbar'>
+                <div class="text-center">
+                    <ul class='pagination'>
+                        <li th:class="${page.firstPage}?'disabled':''">
+                            <span class="page-link" th:if='${page.firstPage or page.number == 1}'>← First</span>
+                            <a class="page-link" th:if='${not page.firstPage and page.number != 1}' th:href='@{${page.url}(page=1,sortDirection=${page.sortDirection})}'>←
+                                First</a>
+                        </li>
+                        <li th:class="${page.hasPreviousPage}? '' : 'disabled'">
+                            <span class="page-link" th:if='${not page.hasPreviousPage or page.number == 1}'>«</span>
+                            <a class="page-link" th:if='${page.hasPreviousPage and page.number != 1}'
+                               th:href='@{${page.url}(page=${page.number - 1},sortDirection=${page.sortDirection})}'
+                               title='Go to previous page'>«</a>
+                        </li>
+                        <li th:each='item : ${page.items}' th:class="${item.current}? 'page-item active' : 'page-item'">
+                            <span class="page-link" th:if='${item.current}' th:text='${item.number}'>1</span>
+                            <a class="page-link" th:if='${not item.current}'
+                               th:href='@{${page.url}(page=${item.number},sortDirection=${page.sortDirection})}'><span
+                                    th:text='${item.number}'>1</span></a>
+                        </li>
+                        <li th:class="${page.hasNextPage}? '' : 'disabled'">
+                            <span class="page-link" th:if='${not page.hasNextPage or page.number == page.totalPages - 1}'>»</span>
+                            <a class="page-link" th:if='${page.hasNextPage and page.number != page.totalPages - 1}'
+                               th:href='@{${page.url}(page=${page.number + 1},sortDirection=${page.sortDirection})}'
+                               title='Go to next page'>»</a>
+                        </li>
+                        <li th:class="${page.lastPage}? 'disabled' : ''">
+                            <span class="page-link" th:if='${page.lastPage}'>Last →</span>
+                            <a class="page-link" th:if='${not page.lastPage}'
+                               th:href='@{${page.url}(page=${page.totalPages - 1},sortDirection=${page.sortDirection})}'>Last →</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"> </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+        crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>
