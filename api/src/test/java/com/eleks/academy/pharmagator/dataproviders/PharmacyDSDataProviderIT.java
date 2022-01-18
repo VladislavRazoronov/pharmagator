@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -62,7 +63,7 @@ class PharmacyDSDataProviderIT {
 
         MedicineDto medicineDto = medicineDtos.get(0);
 
-        assertEquals("DS", medicineDto.getPharmacyName());
+        assertEquals(1, medicineDto.getPrice().compareTo(BigDecimal.ONE));
     }
 
     @Test
