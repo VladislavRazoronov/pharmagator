@@ -3,6 +3,8 @@ package com.eleks.academy.pharmagator.services;
 import com.eleks.academy.pharmagator.entities.Medicine;
 import com.eleks.academy.pharmagator.entities.Pharmacy;
 import com.eleks.academy.pharmagator.entities.Price;
+import lombok.SneakyThrows;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
@@ -25,6 +27,7 @@ import java.time.Instant;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -83,6 +86,13 @@ class ExportServiceIT {
         } finally {
             this.dataSourceConnection.close();
         }
+    }
+
+    @SneakyThrows
+    @Test
+    void getExportData_ok(){
+        XSSFWorkbook workbook = mockService.getExportData();
+        assertTrue(workbook.getNumberOfNames() > 0);
     }
 
     private IDataSet readDataset() throws DataSetException, IOException {
