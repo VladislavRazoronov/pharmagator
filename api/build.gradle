@@ -16,14 +16,9 @@ jacoco {
 
 sonarqube {
     properties {
-        property "sonar.projectKey", "Oleksandr-Eleks_pharmagator"
-        property "sonar.organization", "eleks-jc-2021"
+        property "sonar.projectKey", "VladislavRazoronov_pharmagator"
+        property "sonar.organization", "vladislavrazoronov"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.tests", "src/test"
-        property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco.xml"
-        property "sonar.junit.reportsPath", "build/test-results/*/TEST-*.xml"
     }
 }
 
