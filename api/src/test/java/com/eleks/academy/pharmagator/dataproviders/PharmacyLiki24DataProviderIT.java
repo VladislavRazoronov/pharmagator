@@ -63,7 +63,7 @@ class PharmacyLiki24DataProviderIT {
 
         MedicineDto medicineDto = medicineDtos.get(0);
 
-        assertEquals(1, medicineDto.getPrice().compareTo(BigDecimal.ONE));
+        assertEquals(1, medicineDto.getPrice().compareTo(new BigDecimal(0)));
     }
 
     @Test
