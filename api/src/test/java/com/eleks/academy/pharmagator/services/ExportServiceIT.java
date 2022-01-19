@@ -92,6 +92,7 @@ class ExportServiceIT {
     @Test
     void getExportData_ok(){
         XSSFWorkbook workbook = mockService.getExportData();
+        assertTrue(workbook.getNumberOfNames()>0);
     }
 
     private IDataSet readDataset() throws DataSetException, IOException {
